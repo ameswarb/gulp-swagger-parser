@@ -2,7 +2,6 @@ var gutil = require('gulp-util');
 var parser = require('swagger-parser');
 var PluginError = gutil.PluginError;
 var through = require('through2');
-var _ = require('lodash');
 
 const PLUGIN_NAME = 'gulp-swagger-parser';
 
@@ -12,29 +11,11 @@ function prefixStream(prefixText) {
   return stream;
 }
 
-var gulpSwaggerParser = {
-    validate: function() {
-        console.log('--- validate ---');
-    },
-    dereference: function() {
-        console.log('--- dereference ---');
-    },
-    bundle: function() {
-        console.log('--- bundle ---');
-    },
-    parse: function() {
-        console.log('--- parse ---');
-    },
-    resolve: function() {
-        console.log('--- resolve ---');
-    }
-};
-
 function gulpSwaggerParserWrapper(method, options) {
   if (!method) {
     throw new PluginError(PLUGIN_NAME, 'Please specify a swagger-parser method');
   }
-  if (!gulpSwaggerParser[method]) {
+  if (!parser[method]) {
     throw new PluginError(PLUGIN_NAME, 'Invalid swagger-parser method: ' + method);
   }
   method = new Buffer(method);
@@ -42,27 +23,42 @@ function gulpSwaggerParserWrapper(method, options) {
   options = options || {};
 
   return through.obj(function(file, enc, cb) {
+    var that = this;
 
-    if ( file.isStream() ) {
-        cb(new PluginError(PLUGIN_NAME, 'Streaming not supported'));
+    if (file.isNull() || file.isDirectory()) {
+      this.push(file);
+      return cb();
     }
 
-    if (file.isNull()) {
-      // return empty file
-      return cb(null, file);
+    if (file.isStream()) {
+      this.emit('error', new PluginError({
+        plugin: PLUGIN_NAME,
+        message: 'Streams are not supported.'
+      }));
+      return cb();
     }
 
-    console.log('--- init parser ---');
-    parser[method](file.history[0], options, function(err, api) {
+    if (file.isBuffer()) {
+      parser[method](file.history[0], options, function(err, api) {
         if (err) {
-            cb(new PluginError(PLUGIN_NAME, err.details[0].message));
+          this.emit('error', new PluginError({
+            plugin: PLUGIN_NAME,
+            message: err.details[0].message
+          }));
+          return cb();
         } else {
-            console.log('--- success: ' + method + ' ---');
-            console.log(api);
+          file = new gutil.File({
+                                cwd: "",
+                                base: "",
+                                path: 'api.json',
+                                contents: new Buffer(JSON.stringify(api))
+                              });
+          that.push(file);
+          return cb();
         }
+      });
+    }
 
-        cb(null, file);
-    });
   });
 }
 

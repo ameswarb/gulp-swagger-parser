@@ -22,7 +22,6 @@
   "homepage": "https://github.com/ameswarb/gulp-swagger-parser#readme",
   "dependencies": {
     "gulp-util": "^3.0.7",
-    "lodash": "^3.10.1",
     "swagger-parser": "^3.3.0",
     "through2": "^2.0.0"
   }
