@@ -1,0 +1,29 @@
+{
+  "name": "gulp-swagger-parser",
+  "version": "0.0.1",
+  "description": "Simple gulp wrapper for the node swagger-parser",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ameswarb/gulp-swagger-parser.git"
+  },
+  "keywords": [
+    "gulp",
+    "plugin",
+    "gulpplugin",
+    "swagger",
+    "parser"
+  ],
+  "author": "Alex Meswarb <alex@meswarb.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ameswarb/gulp-swagger-parser/issues"
+  },
+  "homepage": "https://github.com/ameswarb/gulp-swagger-parser#readme",
+  "dependencies": {
+    "gulp-util": "^3.0.7",
+    "lodash": "^3.10.1",
+    "swagger-parser": "^3.3.0",
+    "through2": "^2.0.0"
+  }
+}
